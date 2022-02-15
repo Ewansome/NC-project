@@ -1,9 +1,22 @@
 const express = require("express");
-const { getTopics } = require("./controllers/topics-controller.js");
+const { handle404 } = require("./controllers/error-controller.js");
+const {
+  getTopics,
+  getArticleId,
+} = require("./controllers/topics-controller.js");
 
 const app = express();
-app.use(express.json());
 
 app.get("/api/topics", getTopics);
+app.get("/api/articles/:article_id", getArticleId);
+
+app.all("/*", handle404);
+
+// error handling always has 4 parametres
+app.use((err, req, res, next) => {
+  if (err.code === "22P02") {
+    res.status(400).send({ msg: "Invalid ID query" });
+  }
+});
 
 module.exports = app;

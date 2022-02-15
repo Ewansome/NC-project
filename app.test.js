@@ -14,7 +14,6 @@ describe("GET/api/topics", () => {
       .expect(200)
       .then(({ body }) => {
         const { topics } = body;
-        console.log(topics);
         expect(topics).toBeInstanceOf(Array);
         expect(topics).toHaveLength(3);
         topics.forEach((topic) => {
@@ -28,25 +27,41 @@ describe("GET/api/topics", () => {
       });
   });
 });
-
-//need to write sad test 404
+it("status:404, responds with an error message when path is not found", () => {
+  return request(app)
+    .get("/api/not-a-path")
+    .expect(404)
+    .then((res) => {
+      expect(res.body.msg).toBe("Path not found");
+    });
+});
 
 describe("GET/api/articles/:article_id", () => {
   it("status:200, responds with an article object with author, title, article_id, body, topic, created_at and votes properties", () => {
     const article_id = 1;
     return request(app)
-      .get("/api/articles/:article_id")
+      .get(`/api/articles/${article_id}`)
       .expect(200)
       .then(({ body }) => {
-        expect(body.park).toEqual({
-          article_id: article_id,
-          title: "Running a Node App",
-          topic: "coding",
-          author: "jessjelly",
-          body: "This is part two of a series on how to get up and running with Systemd and Node.js. This part dives deeper into how to successfully run your app with systemd long-term, and how to set it up in a production environment.",
-          created_at: "2020-11-07 06:03:00",
-          votes: 0,
-        });
+        expect(body.article).toEqual(
+          expect.objectContaining({
+            article_id: 1,
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            created_at: expect.any(String),
+            votes: 100,
+          })
+        );
       });
   });
+});
+it("status 400, responds with an invalid id query", () => {
+  return request(app)
+    .get("/api/articles/hello?invalid_id_query")
+    .expect(400)
+    .then((res) => {
+      expect(res.body.msg).toBe("Invalid ID query");
+    });
 });
