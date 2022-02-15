@@ -3,6 +3,7 @@ const app = require("../NC-project/app.js");
 const connection = require("./db/connection");
 const seed = require("./db/seeds/seed");
 const testData = require("./db/data/test-data");
+const sorted = require("jest-sorted");
 
 beforeEach(() => seed(testData));
 afterAll(() => connection.end());
@@ -64,4 +65,31 @@ it("status 400, responds with an invalid id query", () => {
     .then((res) => {
       expect(res.body.msg).toBe("Invalid ID query");
     });
+});
+
+describe("GET /api/articles", () => {
+  it("status:200, responds with an article array of objects with author, title, article_id, topic, created_at and votes properties in order descending by date", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).not.toBeSortedBy("created_at", { desending: true });
+        expect(articles).toBeInstanceOf(Array);
+        expect(articles).toHaveLength(12);
+        articles.forEach((article) => {
+          expect(article).toEqual(
+            expect.objectContaining({
+              author: expect.any(String),
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              topic: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              body: expect.any(String),
+            })
+          );
+        });
+      });
+  });
 });
