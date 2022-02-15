@@ -4,6 +4,7 @@ const {
   getTopics,
   getArticleId,
   getArticles,
+  getUsers,
 } = require("./controllers/topics-controller.js");
 
 const app = express();
@@ -11,6 +12,7 @@ const app = express();
 app.get("/api/topics", getTopics);
 app.get("/api/articles/:article_id", getArticleId);
 app.get("/api/articles", getArticles);
+app.get("/api/users", getUsers);
 
 app.all("/*", handle404);
 
