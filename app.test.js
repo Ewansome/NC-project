@@ -4,6 +4,7 @@ const connection = require("./db/connection");
 const seed = require("./db/seeds/seed");
 const testData = require("./db/data/test-data");
 const sorted = require("jest-sorted");
+const { forEach } = require("./db/data/test-data/articles.js");
 
 beforeEach(() => seed(testData));
 afterAll(() => connection.end());
@@ -60,10 +61,10 @@ describe("GET/api/articles/:article_id", () => {
 });
 it("status 400, responds with an invalid id query", () => {
   return request(app)
-    .get("/api/articles/hello?invalid_id_query")
+    .get("/api/articles/hello")
     .expect(400)
     .then((res) => {
-      expect(res.body.msg).toBe("Invalid ID query");
+      expect(res.body.msg).toBe("Invalid input");
     });
 });
 
@@ -74,7 +75,10 @@ describe("GET /api/articles", () => {
       .expect(200)
       .then(({ body }) => {
         const { articles } = body;
-        expect(articles).not.toBeSortedBy("created_at", { desending: true });
+        expect(articles).not.toBeSortedBy({
+          key: "created_at",
+          descending: true,
+        });
         expect(articles).toBeInstanceOf(Array);
         expect(articles).toHaveLength(12);
         articles.forEach((article) => {
@@ -97,7 +101,7 @@ describe("GET /api/articles", () => {
 describe("GET/api/users", () => {
   it("status:200, responds with an array of objects with a username property", () => {
     return request(app)
-      .get("/api/users")
+      .get("/api/users/username")
       .expect(200)
       .then(({ body }) => {
         expect(body).toBeInstanceOf(Array);
@@ -106,11 +110,81 @@ describe("GET/api/users", () => {
           expect(user).toEqual(
             expect.objectContaining({
               username: expect.any(String),
-              name: expect.any(String),
-              avatar_url: expect.any(String),
             })
           );
         });
+      });
+  });
+});
+
+describe("Patch/api/articles/:article_id", () => {
+  it("status: 200, request body accepts an object that increments the current articles vote", () => {
+    const votesUpdate = {
+      votes: 2,
+    };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(votesUpdate)
+      .expect(200)
+      .then(({ body }) => {
+        const { article } = body;
+        expect(article).toBeInstanceOf(Array);
+        article.forEach((article) => {
+          expect(article).toEqual(
+            expect.objectContaining({
+              article_id: 1,
+              votes: 102,
+            })
+          );
+        });
+      });
+  });
+  it("status: 400, responds with an error message when passed an incorrect article ID", () => {
+    const votesUpdate = {
+      votes: 2,
+    };
+    return request(app)
+      .patch("/api/articles/notAnId")
+      .send(votesUpdate)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input");
+      });
+  });
+  it("status: 400, responds with an error message when passed an update without a number", () => {
+    const votesUpdate = {
+      votes: "two",
+    };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(votesUpdate)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input");
+      });
+  });
+  it("status: 400, responds with an error message when passed an update object with the wrong key", () => {
+    const votesUpdate = {
+      setov: 2,
+    };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(votesUpdate)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input");
+      });
+  });
+  it("status: 404, ID does not exist", () => {
+    const votesUpdate = {
+      votes: 2,
+    };
+    return request(app)
+      .patch("/api/articles/9999")
+      .send(votesUpdate)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Path not found");
       });
   });
 });
