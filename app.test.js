@@ -188,3 +188,9 @@ describe("Patch/api/articles/:article_id", () => {
       });
   });
 });
+
+describe("DELETE/api/comments/:comment_id", () => {
+  it("Deletes the given comment by the comment_id", () => {
+    return request(app).delete("/api/comments/2").expect(204);
+  });
+});
