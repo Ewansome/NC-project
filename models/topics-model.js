@@ -49,3 +49,13 @@ exports.fetchUsers = () => {
     return rows;
   });
 };
+
+exports.removeCommentById = (id) => {
+  console.log(id);
+  return db.query(
+    `
+  DELETE FROM comments WHERE comment_id = $1
+  `,
+    [id]
+  );
+};
