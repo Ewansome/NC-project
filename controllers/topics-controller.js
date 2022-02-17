@@ -5,6 +5,8 @@ const {
   fetchUsers,
   updateArticleByVote,
   removeCommentById,
+  fetchArticleByCommentId,
+  insertComment,
 } = require("../models/topics-model.js");
 
 exports.getTopics = (req, res, next) => {
@@ -38,6 +40,16 @@ exports.getArticleId = (req, res, next) => {
     });
 };
 
+exports.getArticleByCommentId = (req, res, next) => {
+  fetchArticleByCommentId(req.params.article_id)
+    .then((article) => {
+      res.status(200).send(article);
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
 exports.patchArticleByVote = (req, res, next) => {
   updateArticleByVote(req.body.votes, req.params.article_id)
     .then((article) => {
@@ -62,6 +74,16 @@ exports.deleteCommentById = (req, res, next) => {
   removeCommentById(req.params.comment_id)
     .then(() => {
       res.status(204).send();
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.postComment = (req, res, next) => {
+  insertComment(req.body, req.params.article_id)
+    .then((comment) => {
+      res.status(201).send({ comment });
     })
     .catch((err) => {
       next(err);

@@ -7,6 +7,8 @@ const {
   getUsers,
   patchArticleByVote,
   deleteCommentById,
+  getArticleByCommentId,
+  postComment,
 } = require("./controllers/topics-controller.js");
 
 const app = express();
@@ -14,13 +16,15 @@ app.use(express.json());
 
 app.get("/api/topics", getTopics);
 app.get("/api/articles/:article_id", getArticleId);
-
+app.get("/api/articles/:article_id/comments", getArticleByCommentId);
 app.get("/api/articles", getArticles);
 app.get("/api/users/username", getUsers);
 
 app.delete("/api/comments/:comment_id", deleteCommentById);
 
 app.patch("/api/articles/:article_id", patchArticleByVote);
+
+app.post("/api/articles/:article_id/comments", postComment);
 
 app.all("/*", handle404);
 
