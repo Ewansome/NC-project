@@ -59,7 +59,7 @@ describe("GET/api/articles/:article_id", () => {
       });
   });
 });
-it("status 400, responds with an invalid id query", () => {
+it("status:400, responds with an invalid id query", () => {
   return request(app)
     .get("/api/articles/hello")
     .expect(400)
@@ -68,7 +68,7 @@ it("status 400, responds with an invalid id query", () => {
     });
 });
 
-describe("GET /api/articles", () => {
+describe("GET/api/articles", () => {
   it("status:200, responds with an article array of objects with author, title, article_id, topic, created_at and votes properties in order descending by date", () => {
     return request(app)
       .get("/api/articles")
@@ -117,8 +117,8 @@ describe("GET/api/users", () => {
   });
 });
 
-describe("Patch/api/articles/:article_id", () => {
-  it("status: 200, request body accepts an object that increments the current articles vote", () => {
+describe("PATCH/api/articles/:article_id", () => {
+  it("status:200, request body accepts an object that increments the current articles vote", () => {
     const votesUpdate = {
       votes: 2,
     };
@@ -139,7 +139,7 @@ describe("Patch/api/articles/:article_id", () => {
         });
       });
   });
-  it("status: 400, responds with an error message when passed an incorrect article ID", () => {
+  it("status:400, responds with an error message when passed an incorrect article ID", () => {
     const votesUpdate = {
       votes: 2,
     };
@@ -151,7 +151,7 @@ describe("Patch/api/articles/:article_id", () => {
         expect(body.msg).toBe("Invalid input");
       });
   });
-  it("status: 400, responds with an error message when passed an update without a number", () => {
+  it("status:400, responds with an error message when passed an update without a number", () => {
     const votesUpdate = {
       votes: "two",
     };
@@ -163,19 +163,7 @@ describe("Patch/api/articles/:article_id", () => {
         expect(body.msg).toBe("Invalid input");
       });
   });
-  it("status: 400, responds with an error message when passed an update object with the wrong key", () => {
-    const votesUpdate = {
-      setov: 2,
-    };
-    return request(app)
-      .patch("/api/articles/1")
-      .send(votesUpdate)
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe("Invalid input");
-      });
-  });
-  it("status: 404, ID does not exist", () => {
+  it("status:404, ID does not exist", () => {
     const votesUpdate = {
       votes: 2,
     };
@@ -193,4 +181,44 @@ describe("DELETE/api/comments/:comment_id", () => {
   it("Deletes the given comment by the comment_id", () => {
     return request(app).delete("/api/comments/2").expect(204);
   });
+});
+
+describe("GET/api/articles/:article_id/comments", () => {
+  it("Responds with an array of comments for the given article_id, each comment with 5 properties: comment_id, votes, created_at, author(username), body", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        console.log(body);
+        expect(body).toBeInstanceOf(Array);
+        body.forEach((comment) => {
+          expect(comment).toEqual(
+            expect.objectContaining({
+              comment_id: expect.any(Number),
+              article_id: expect.any(Number),
+              body: expect.any(String),
+              votes: expect.any(Number),
+              author: expect.any(String),
+              created_at: expect.any(String),
+            })
+          );
+        });
+      });
+  });
+});
+it("status:400, responds with an invalid id query when passed incorrect input", () => {
+  return request(app)
+    .get("/api/articles/invalid_id/comments")
+    .expect(400)
+    .then((res) => {
+      expect(res.body.msg).toBe("Invalid input");
+    });
+});
+it("status:404, responds with an error message when path is not found", () => {
+  return request(app)
+    .get("/api/articl/4/comments")
+    .expect(404)
+    .then((res) => {
+      expect(res.body.msg).toBe("Path not found");
+    });
 });

@@ -5,6 +5,7 @@ const {
   fetchUsers,
   updateArticleByVote,
   removeCommentById,
+  fetchArticleByCommentId,
 } = require("../models/topics-model.js");
 
 exports.getTopics = (req, res, next) => {
@@ -32,6 +33,16 @@ exports.getArticleId = (req, res, next) => {
   fetchArticleId(articleId)
     .then((article) => {
       res.status(200).send({ article });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.getArticleByCommentId = (req, res, next) => {
+  fetchArticleByCommentId(req.params.article_id)
+    .then((article) => {
+      res.status(200).send(article);
     })
     .catch((err) => {
       next(err);
