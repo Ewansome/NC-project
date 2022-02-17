@@ -80,20 +80,19 @@ exports.removeCommentById = (id) => {
 };
 
 exports.insertComment = (newComment, article_id) => {
-  const { username, body } = newComment;
-  console.log(username);
+  const { author, body } = newComment;
   return db
     .query(
       `
-      INSERT INTO comments(article_id, username, body)
+      INSERT INTO comments(article_id, author, body)
       VALUES
       ($1, $2, $3)
+      RETURNING *
 
     `,
-      [article_id, username, body]
+      [article_id, author, body]
     )
-    .then(({ rows }) => {
-      console.log(comment);
-      return rows;
+    .then(({ rows: [comment] }) => {
+      return comment;
     });
 };

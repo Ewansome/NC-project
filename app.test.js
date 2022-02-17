@@ -229,7 +229,7 @@ it("status:400, responds with an invalid id query when passed incorrect input", 
       expect(res.body.msg).toBe("Invalid input");
     });
 });
-it("status:400, responds with an error message when article does not exist", () => {
+it("status:404, responds with an error message when article does not exist", () => {
   return request(app)
     .get("/api/articles/999999/comments")
     .expect(404)
@@ -241,7 +241,7 @@ it("status:400, responds with an error message when article does not exist", () 
 describe("POST/api/articles/:article_id/comments", () => {
   it("status:201, responds with new comment which is an object containing a username and body", () => {
     const newComment = {
-      username: "William McSwinging",
+      author: "icellusedkars",
       body: "meep-morp.",
     };
     return request(app)
@@ -249,11 +249,32 @@ describe("POST/api/articles/:article_id/comments", () => {
       .send(newComment)
       .expect(201)
       .then(({ body }) => {
-        console.log(body);
-        expect(body).toEqual({
-          article_id: 1,
-          ...newComment,
-        });
+        const { comment } = body;
+        expect(comment).toEqual(
+          expect.objectContaining({
+            article_id: 1,
+            ...newComment,
+          })
+        );
+      });
+  });
+  it("status:400, responds with an invalid id query when passed an invalid input", () => {
+    const badAuthor = {
+      author: "uvutcutcuuvu",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(badAuthor)
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Invalid input");
       });
   });
 });
+
+// describe("GET/api/articles/:article_id (comment count)", () => {
+//   it("Status:200, responds with an object that includes a count of all the comments with the specified article_id", () => {
+//     return request(app).get("/api/articles/:article_id");
+//   });
+// });
