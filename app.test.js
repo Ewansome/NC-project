@@ -181,6 +181,22 @@ describe("DELETE/api/comments/:comment_id", () => {
   it("Deletes the given comment by the comment_id", () => {
     return request(app).delete("/api/comments/2").expect(204);
   });
+  it("status:400, responds with an invalid id query when passed an invalid comment_id", () => {
+    return request(app)
+      .delete("/api/comments/:comment_id")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input");
+      });
+  });
+  it("status:404, responds with path not found when id query does not exist", () => {
+    return request(app)
+      .delete("/api/comment/4")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Path not found");
+      });
+  });
 });
 
 describe("GET/api/articles/:article_id/comments", () => {
@@ -189,7 +205,6 @@ describe("GET/api/articles/:article_id/comments", () => {
       .get("/api/articles/1/comments")
       .expect(200)
       .then(({ body }) => {
-        console.log(body);
         expect(body).toBeInstanceOf(Array);
         body.forEach((comment) => {
           expect(comment).toEqual(
@@ -214,11 +229,31 @@ it("status:400, responds with an invalid id query when passed incorrect input", 
       expect(res.body.msg).toBe("Invalid input");
     });
 });
-it("status:404, responds with an error message when path is not found", () => {
+it("status:400, responds with an error message when article does not exist", () => {
   return request(app)
-    .get("/api/articl/4/comments")
+    .get("/api/articles/999999/comments")
     .expect(404)
-    .then((res) => {
-      expect(res.body.msg).toBe("Path not found");
+    .then(({ body: { msg } }) => {
+      expect(msg).toBe("Article does not exist");
     });
+});
+
+describe("POST/api/articles/:article_id/comments", () => {
+  it("status:201, responds with new comment which is an object containing a username and body", () => {
+    const newComment = {
+      username: "William McSwinging",
+      body: "meep-morp.",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(201)
+      .then(({ body }) => {
+        console.log(body);
+        expect(body).toEqual({
+          article_id: 1,
+          ...newComment,
+        });
+      });
+  });
 });

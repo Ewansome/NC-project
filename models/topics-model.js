@@ -33,9 +33,9 @@ exports.fetchArticleByCommentId = (commentId) => {
     )
     .then(({ rows }) => {
       if (rows.length === 0) {
-        Promise.reject({
+        return Promise.reject({
           status: 404,
-          message: "Article does not exist",
+          msg: "Article does not exist",
         });
       }
       return rows;
@@ -77,4 +77,23 @@ exports.removeCommentById = (id) => {
   `,
     [id]
   );
+};
+
+exports.insertComment = (newComment, article_id) => {
+  const { username, body } = newComment;
+  console.log(username);
+  return db
+    .query(
+      `
+      INSERT INTO comments(article_id, username, body)
+      VALUES
+      ($1, $2, $3)
+
+    `,
+      [article_id, username, body]
+    )
+    .then(({ rows }) => {
+      console.log(comment);
+      return rows;
+    });
 };
