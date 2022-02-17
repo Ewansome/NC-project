@@ -249,10 +249,14 @@ describe("POST/api/articles/:article_id/comments", () => {
       .send(newComment)
       .expect(201)
       .then(({ body }) => {
+        console.log(body);
         const { comment } = body;
         expect(comment).toEqual(
           expect.objectContaining({
             article_id: 1,
+            created_at: expect.any(String),
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
             ...newComment,
           })
         );
