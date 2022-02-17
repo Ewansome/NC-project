@@ -273,8 +273,35 @@ describe("POST/api/articles/:article_id/comments", () => {
   });
 });
 
-// describe("GET/api/articles/:article_id (comment count)", () => {
-//   it("Status:200, responds with an object that includes a count of all the comments with the specified article_id", () => {
-//     return request(app).get("/api/articles/:article_id");
-//   });
-// });
+describe("GET/api/articles/:article_id (comment count)", () => {
+  it("Status:200, responds with an object that includes a count of all the comments with the specified article_id", () => {
+    return request(app)
+      .get("/api/articles/1/comment_count")
+      .expect(200)
+      .then(({ body }) => {
+        const [obj] = body;
+        expect(obj).toBeInstanceOf(Object);
+        expect(obj).toEqual(
+          expect.objectContaining({
+            article_id: expect.any(Number),
+            title: expect.any(String),
+            topic: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            comment_count: expect.any(Number),
+          })
+        );
+      });
+  });
+  it("status:400, responds with an invalid id query when passed incorrect input", () => {
+    return request(app)
+      .get("/api/articles/not_a_valid_id/comment_count")
+      .expect(400)
+      .then((res) => {
+        console.log(res);
+        expect(res.body.msg).toBe("Invalid input");
+      });
+  });
+});

@@ -96,3 +96,48 @@ exports.insertComment = (newComment, article_id) => {
       return comment;
     });
 };
+
+exports.fetchCommentCount = (id) => {
+  return db
+    .query(
+      `
+        SELECT * FROM comments
+        WHERE article_id = $1
+      `,
+      [id]
+    )
+    .then(({ rows }) => {
+      const commentCount = rows.length;
+      return db
+        .query(
+          `
+        ALTER TABLE articles
+        ADD comment_count INT
+        `
+        )
+        .then(() => {
+          return db
+            .query(
+              `
+          UPDATE articles
+          SET comment_count = $1
+          WHERE article_id = $2
+          `,
+              [commentCount, id]
+            )
+            .then(() => {
+              return db
+                .query(
+                  `
+              SELECT * FROM articles 
+              WHERE article_id = $1
+              `,
+                  [id]
+                )
+                .then(({ rows }) => {
+                  return rows;
+                });
+            });
+        });
+    });
+};
