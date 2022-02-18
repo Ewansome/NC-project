@@ -91,6 +91,7 @@ describe("GET/api/articles", () => {
               created_at: expect.any(String),
               votes: expect.any(Number),
               body: expect.any(String),
+              comment_count: expect.any(Number),
             })
           );
         });
@@ -331,6 +332,14 @@ describe("GET /api/articles (comment count)", () => {
             })
           );
         });
+      });
+  });
+  it("Status:404, returns an error message of 'Invalid inuput' when passed an invalid request", () => {
+    return request(app)
+      .get("/api/not_a_valid_input")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("Path not found");
       });
   });
 });

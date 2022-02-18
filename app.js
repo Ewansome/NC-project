@@ -20,19 +20,10 @@ app.get("/api/topics", getTopics);
 app.get("/api/articles/:article_id", getArticleId);
 app.get("/api/articles/:article_id/comments", getArticleByCommentId);
 
-//
-//
-//
-//
-
 app.get("/api/articles", getArticles);
 
-//
-//
-//
-//
-
 app.get("/api/users/username", getUsers);
+
 app.get("/api/articles/:article_id/comment_count", getCommentCountFromId);
 
 app.delete("/api/comments/:comment_id", deleteCommentById);

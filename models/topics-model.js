@@ -10,40 +10,36 @@ exports.fetchArticles = () => {
   return db
     .query(
       `
-  ALTER TABLE articles
-  ADD comment_count INT
-  
-  `
+    ALTER TABLE articles
+    ADD comment_count INT
+    
+    `
     )
     .then(({}) => {
       return db
         .query(
           `
-    SELECT comments.article_id, 
-    COUNT(comments.article_id) AS comment_count
-    FROM comments
-    LEFT JOIN articles ON articles.article_id = comments.article_id
-    GROUP BY comments.article_id
-    `
+      SELECT comments.article_id, 
+      COUNT(comments.article_id) AS comment_count
+      FROM comments
+      LEFT JOIN articles ON articles.article_id = comments.article_id
+      GROUP BY comments.article_id
+      `
         )
-        .then(({ rows }) => {
+        .then(() => {
           return db
             .query(
               `
-          UPDATE articles a
-          SET comment_count = (
-            SELECT COUNT(*)
-            FROM comments c
-            WHERE c.article_id = a.article_id)
-            RETURNING *;
-          `
+            UPDATE articles a
+            SET comment_count = (
+              SELECT COUNT(*)
+              FROM comments c
+              WHERE c.article_id = a.article_id)
+              RETURNING *;
+            `
             )
             .then(({ rows }) => {
-              console.log(rows);
               return rows;
-            })
-            .catch((err) => {
-              console.log(err);
             });
         });
     });
@@ -146,7 +142,6 @@ exports.fetchCommentCount = (id) => {
       [id]
     )
     .then(({ rows }) => {
-      console.log(rows);
       const commentCount = rows.length;
       return db
         .query(
