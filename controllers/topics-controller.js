@@ -27,6 +27,7 @@ exports.getArticles = (req, res, next) => {
       res.status(200).send({ articles: article });
     })
     .catch((err) => {
+      console.log(err);
       next(err);
     });
 };
@@ -90,11 +91,6 @@ exports.postComment = (req, res, next) => {
     .catch((err) => {
       next(err);
     });
-};
-
-exports.getCommentCount = (req, res, next) => {
-  console.log(req.params);
-  grabCommentCount();
 };
 
 exports.getCommentCountFromId = (req, res, next) => {

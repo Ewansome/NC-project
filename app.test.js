@@ -91,6 +91,7 @@ describe("GET/api/articles", () => {
               created_at: expect.any(String),
               votes: expect.any(Number),
               body: expect.any(String),
+              comment_count: expect.any(Number),
             })
           );
         });
@@ -312,23 +313,34 @@ describe("GET/api/articles/:article_id (comment count)", () => {
 describe("GET /api/articles (comment count)", () => {
   it("status:200, responds with an array of article objects which all include a comment count", () => {
     return request(app)
-      .get("/api/articles/comment_count")
+      .get("/api/articles")
       .expect(200)
       .then(({ body }) => {
-        console.log(body);
-        expect(body).toBeInstanceOf(Object);
-        expect(body).toHaveLength(12);
-        body.forEach((article) => {
-          expect(article).objectContaining({
-            title: expect.any(String),
-            topic: expect.any(String),
-            author: expect.any(String),
-            body: expect.any(String),
-            created_at: expect.any(Number),
-            votes: expect.any(Number),
-            comment_count: expect.any(Number),
-          });
+        const { articles } = body;
+        expect(articles).toBeInstanceOf(Object);
+        expect(articles).toHaveLength(12);
+        articles.forEach((article) => {
+          expect(article).toEqual(
+            expect.objectContaining({
+              article_id: expect.any(Number),
+              title: expect.any(String),
+              topic: expect.any(String),
+              author: expect.any(String),
+              body: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              comment_count: expect.any(Number),
+            })
+          );
         });
+      });
+  });
+  it("Status:404, returns an error message of 'Invalid inuput' when passed an invalid request", () => {
+    return request(app)
+      .get("/api/not_a_valid_input")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("Path not found");
       });
   });
 });
