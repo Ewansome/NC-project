@@ -97,6 +97,10 @@ exports.insertComment = (newComment, article_id) => {
     });
 };
 
+exports.grabCommentCount = () => {
+  console.log("Hello!");
+};
+
 exports.fetchCommentCount = (id) => {
   return db
     .query(
@@ -107,6 +111,7 @@ exports.fetchCommentCount = (id) => {
       [id]
     )
     .then(({ rows }) => {
+      console.log(rows);
       const commentCount = rows.length;
       return db
         .query(

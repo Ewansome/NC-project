@@ -8,6 +8,7 @@ const {
   fetchArticleByCommentId,
   insertComment,
   fetchCommentCount,
+  grabCommentCount,
 } = require("../models/topics-model.js");
 
 exports.getTopics = (req, res, next) => {
@@ -92,6 +93,11 @@ exports.postComment = (req, res, next) => {
 };
 
 exports.getCommentCount = (req, res, next) => {
+  console.log(req.params);
+  grabCommentCount();
+};
+
+exports.getCommentCountFromId = (req, res, next) => {
   fetchCommentCount(req.params.article_id)
     .then((article) => {
       res.status(200).send(article);
