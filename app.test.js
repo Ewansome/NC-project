@@ -249,6 +249,7 @@ describe("POST/api/articles/:article_id/comments", () => {
       .send(newComment)
       .expect(201)
       .then(({ body }) => {
+        console.log(body);
         const { comment } = body;
         expect(comment).toEqual(
           expect.objectContaining({
